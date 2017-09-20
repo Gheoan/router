@@ -401,8 +401,10 @@ export class Router {
     }
 
     let instructionInit = {
+      params: { path: fragment },
       fragment,
       queryString,
+      queryParams: results ? results.queryParams: {},
       config: null,
       parentInstruction,
       previousInstruction: this.currentInstruction,
@@ -428,11 +430,8 @@ export class Router {
 
       return Promise.resolve(instruction);
     } else if (this.catchAllHandler) {
-      let instruction = new NavigationInstruction(Object.assign({}, instructionInit, {
-        params: { path: fragment },
-        queryParams: results ? results.queryParams : {},
-        config: null // config will be created by the catchAllHandler
-      }));
+      // config will be created by the catchAllHandler
+      let instruction = new NavigationInstruction(Object.assign({}, instructionInit));
 
       return evaluateNavigationStrategy(instruction, this.catchAllHandler);
     } else if (this.parent) {
@@ -442,12 +441,10 @@ export class Router {
         let newParentInstruction = this._findParentInstructionFromRouter(router, parentInstruction);
 
         let instruction = new NavigationInstruction(Object.assign({}, instructionInit, {
-          params: { path: fragment },
-          queryParams: results ? results.queryParams : {},
           router: router,
           parentInstruction: newParentInstruction,
           parentCatchHandler: true,
-          config: null // config will be created by the chained parent catchAllHandler
+          // config will be created by the chained parent catchAllHandler
         }));
 
         return evaluateNavigationStrategy(instruction, router.catchAllHandler);
