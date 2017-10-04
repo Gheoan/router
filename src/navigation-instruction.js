@@ -1,4 +1,7 @@
-interface NavigationInstructionInit {
+import { Router } from './router';
+import { Plan } from "./navigation-plan";
+
+export interface NavigationInstructionInit {
   fragment: string,
   queryString: string,
   params : Object,
@@ -10,8 +13,21 @@ interface NavigationInstructionInit {
   options: Object
 }
 
+export type LifecycleArgs = [any, RouteConfig, NavigationInstruction];
+
+export interface ViewPortInstruction {
+  name: string,
+  strategy: 'no-change' | 'invoke-lifecycle'| 'replace',
+  moduleId: string,
+  component,
+  childRouter: Router,
+  lifecycleArgs: LifecycleArgs;
+  childNavigationInstruction?: NavigationInstruction;
+}
+
 export class CommitChangesStep {
   run(navigationInstruction: NavigationInstruction, next: Function) {
+
     return navigationInstruction._commitChanges(true).then(() => {
       navigationInstruction._updateTitle();
       return next();
@@ -56,19 +72,21 @@ export class NavigationInstruction {
   /**
   * The instruction being replaced by this instruction in the current router.
   */
-  previousInstruction: NavigationInstruction;
+  previousInstruction: NavigationInstruction | null;
 
   /**
   * viewPort instructions to used activation.
   */
-  viewPortInstructions: any;
+  viewPortInstructions: { [key: string]:  ViewPortInstruction};
 
   /**
     * The router instance.
   */
   router: Router;
 
-  plan: Object = null;
+  plan: Plan | null = null;
+
+  lifecycleArgs: [any, RouteConfig, NavigationInstruction];
 
   options: Object = {};
 
@@ -79,7 +97,7 @@ export class NavigationInstruction {
     this.viewPortInstructions = {};
 
     let ancestorParams = [];
-    let current = this;
+    let current: NavigationInstruction = this;
     do {
       let currentParams = Object.assign({}, current.params);
       if (current.config && current.config.hasChildRouter) {
@@ -99,7 +117,7 @@ export class NavigationInstruction {
   * Gets an array containing this instruction and all child instructions for the current navigation.
   */
   getAllInstructions(): Array<NavigationInstruction> {
-    let instructions = [this];
+    let instructions:  NavigationInstruction[]= [this];
     for (let key in this.viewPortInstructions) {
       let childInstruction = this.viewPortInstructions[key].childNavigationInstruction;
       if (childInstruction) {
@@ -115,14 +133,14 @@ export class NavigationInstruction {
   * Previous instructions are no longer available after navigation completes.
   */
   getAllPreviousInstructions(): Array<NavigationInstruction> {
-    return this.getAllInstructions().map(c => c.previousInstruction).filter(c => c);
+    return this.getAllInstructions().map(c => c.previousInstruction!).filter(c => c);
   }
 
   /**
   * Adds a viewPort instruction.
   */
-  addViewPortInstruction(viewPortName: string, strategy: string, moduleId: string, component: any): any {
-    const config = Object.assign({}, this.lifecycleArgs[1], { currentViewPort: viewPortName });
+  addViewPortInstruction(viewPortName: string, strategy: 'no-change' | 'invoke-lifecycle'| 'replace', moduleId: string, component: any): ViewPortInstruction {
+    const config: RouteConfig = Object.assign({}, this.lifecycleArgs[1], { currentViewPort: viewPortName });
     let viewportInstruction = this.viewPortInstructions[viewPortName] = {
       name: viewPortName,
       strategy: strategy,
@@ -278,7 +296,7 @@ export class NavigationInstruction {
   }
 }
 
-function prune(instruction) {
+function prune(instruction: NavigationInstruction) {
   instruction.previousInstruction = null;
   instruction.plan = null;
 }

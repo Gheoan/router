@@ -12,7 +12,7 @@ export const pipelineStatus = {
 * A callback to indicate when pipeline processing should advance to the next step
 * or be aborted.
 */
-interface Next {
+export interface Next {
   /**
   * Indicates the successful completion of the pipeline step.
   */

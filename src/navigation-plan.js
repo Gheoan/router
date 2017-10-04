@@ -1,6 +1,7 @@
-import {Redirect} from './navigation-commands';
-import {_resolveUrl} from './util';
-
+import { Redirect } from './navigation-commands';
+import { _resolveUrl } from './util';
+import { NavigationInstruction } from "./navigation-instruction";
+import { Next } from "./pipeline";
 /**
 * The strategy to use when activating modules during navigation.
 */
@@ -11,7 +12,7 @@ export const activationStrategy: ActivationStrategy = {
 };
 
 export class BuildNavigationPlanStep {
-  run(navigationInstruction: NavigationInstruction, next: Function) {
+  run(navigationInstruction: NavigationInstruction, next: Next) {
     return _buildNavigationPlan(navigationInstruction)
       .then(plan => {
         navigationInstruction.plan = plan;
@@ -20,7 +21,20 @@ export class BuildNavigationPlanStep {
   }
 }
 
-export function _buildNavigationPlan(instruction: NavigationInstruction, forceLifecycleMinimum): Promise<Object> {
+export interface Plan {
+  [key: string]: ViewPortPlan;
+}
+
+export interface ViewPortPlan {
+  name: string;
+  config: RouteConfig;
+  prevComponent: NavigationInstruction;
+  prevModuleId: string;
+  strategy?: 'no-change' | 'invoke-lifecycle' | 'replace';
+  childNavigationInstruction?: NavigationInstruction;
+}
+
+export function _buildNavigationPlan(instruction: NavigationInstruction, forceLifecycleMinimum?): Promise<Plan> {
   let prev = instruction.previousInstruction;
   let config = instruction.config;
   let plan = {};
@@ -44,7 +58,7 @@ export function _buildNavigationPlan(instruction: NavigationInstruction, forceLi
 
       if (!nextViewPortConfig) throw new Error(`Invalid Route Config: Configuration for viewPort "${viewPortName}" was not found for route: "${instruction.config.route}."`);
 
-      let viewPortPlan = plan[viewPortName] = {
+      let viewPortPlan: ViewPortPlan = plan[viewPortName] = {
         name: viewPortName,
         config: nextViewPortConfig,
         prevComponent: prevViewPortInstruction.component,

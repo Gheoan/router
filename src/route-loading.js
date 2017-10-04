@@ -1,7 +1,19 @@
-import {activationStrategy, _buildNavigationPlan} from './navigation-plan';
+import {activationStrategy, _buildNavigationPlan, ViewPortPlan} from './navigation-plan';
+import { Router } from './router';
+import { NavigationInstruction } from './navigation-instruction';
+import { Next } from './pipeline';
+import { Container } from "aurelia-dependency-injection";
+
+export interface RouterComponent {
+  viewModel: ConfiguresRouter;
+  childContainer: Container & { getChildRouter: () => Router };
+  router: Router;
+  config;
+  childRouter?: Router;
+}
 
 export class RouteLoader {
-  loadRoute(router: any, config: any, navigationInstruction: any) {
+  loadRoute(router: Router, config: RouteConfig, navigationInstruction: NavigationInstruction): Promise<RouterComponent> {
     throw Error('Route loaders must implement "loadRoute(router, config, navigationInstruction)".');
   }
 }
@@ -9,11 +21,13 @@ export class RouteLoader {
 export class LoadRouteStep {
   static inject() { return [RouteLoader]; }
 
+  routeLoader: RouteLoader;
+
   constructor(routeLoader: RouteLoader) {
     this.routeLoader = routeLoader;
   }
 
-  run(navigationInstruction: NavigationInstruction, next: Function) {
+  run(navigationInstruction: NavigationInstruction, next: Next): Promise<Next> {
     return loadNewRoute(this.routeLoader, navigationInstruction)
       .then(next)
       .catch(next.cancel);
@@ -32,8 +46,13 @@ function loadNewRoute(routeLoader: RouteLoader, navigationInstruction: Navigatio
   return Promise.all(loadPromises);
 }
 
-function determineWhatToLoad(navigationInstruction: NavigationInstruction, toLoad: Array<Object> = []) {
-  let plan = navigationInstruction.plan;
+interface ToLoad {
+  viewPortPlan: ViewPortPlan;
+  navigationInstruction: NavigationInstruction;
+}
+
+function determineWhatToLoad(navigationInstruction: NavigationInstruction, toLoad: Array<ToLoad> = []): ToLoad[] {
+  let plan = navigationInstruction.plan!;
 
   for (let viewPortName in plan) {
     let viewPortPlan = plan[viewPortName];
@@ -61,7 +80,7 @@ function determineWhatToLoad(navigationInstruction: NavigationInstruction, toLoa
   return toLoad;
 }
 
-function loadRoute(routeLoader: RouteLoader, navigationInstruction: NavigationInstruction, viewPortPlan: any) {
+function loadRoute(routeLoader: RouteLoader, navigationInstruction: NavigationInstruction, viewPortPlan: ViewPortPlan):Promise<NavigationInstruction> | undefined  {
   let moduleId = viewPortPlan.config.moduleId;
 
   return loadComponent(routeLoader, navigationInstruction, viewPortPlan.config).then((component) => {
@@ -93,7 +112,7 @@ function loadRoute(routeLoader: RouteLoader, navigationInstruction: NavigationIn
   });
 }
 
-function loadComponent(routeLoader: RouteLoader, navigationInstruction: NavigationInstruction, config: any) {
+function loadComponent(routeLoader: RouteLoader, navigationInstruction: NavigationInstruction, config: RouteConfig): Promise<RouterComponent> {
   let router = navigationInstruction.router;
   let lifecycleArgs = navigationInstruction.lifecycleArgs;
 

@@ -447,7 +447,7 @@ export class Router {
           // config will be created by the chained parent catchAllHandler
         }));
 
-        return evaluateNavigationStrategy(instruction, router.catchAllHandler);
+        return evaluateNavigationStrategy(instruction, router.catchAllHandler)
       }
     }
 
