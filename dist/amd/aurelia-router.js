@@ -936,23 +936,21 @@ define(['exports', 'aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depen
       var caseSensitive = config.caseSensitive === true;
       var state = this._recognizer.add({ path: path, handler: config, caseSensitive: caseSensitive });
 
-      if (path) {
-        var _settings = config.settings;
-        delete config.settings;
-        var withChild = JSON.parse(JSON.stringify(config));
-        config.settings = _settings;
-        withChild.route = path + '/*childRoute';
-        withChild.hasChildRouter = true;
-        this._childRecognizer.add({
-          path: withChild.route,
-          handler: withChild,
-          caseSensitive: caseSensitive
-        });
+      var settings = config.settings;
+      delete config.settings;
+      var withChild = JSON.parse(JSON.stringify(config));
+      config.settings = settings;
+      withChild.route = path + '/*childRoute';
+      withChild.hasChildRouter = true;
+      this._childRecognizer.add({
+        path: withChild.route,
+        handler: withChild,
+        caseSensitive: caseSensitive
+      });
 
-        withChild.navModel = navModel;
-        withChild.settings = config.settings;
-        withChild.navigationStrategy = config.navigationStrategy;
-      }
+      withChild.navModel = navModel;
+      withChild.settings = config.settings;
+      withChild.navigationStrategy = config.navigationStrategy;
 
       config.navModel = navModel;
 
@@ -1042,6 +1040,11 @@ define(['exports', 'aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depen
       var results = this._recognizer.recognize(url);
       if (!results || !results.length) {
         results = this._childRecognizer.recognize(url);
+        if (results && (this.catchAllHandler || this.parent && this._parentCatchAllHandler(this.parent))) {
+          results = Array.prototype.filter.call(results, function (result) {
+            return result.handler.route !== '/*childRoute';
+          });
+        }
       }
 
       var instructionInit = {
