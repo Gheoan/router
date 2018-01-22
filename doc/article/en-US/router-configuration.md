@@ -1,19 +1,9 @@
 ---
-{
-  "name": "Router Configuration",
-  "culture": "en-US",
-  "description": "This article covers Aurelia's router configuration.",
-  "engines" : { "aurelia-doc" : "^1.0.0" },
-  "author": {
-    "name": "Jeremy Gonzalez",
-    "url": "http://www.jeremyg.net"
-  },
-  "contributors": [],
-  "translators": [],
-  "keywords": ["JavaScript", "Router"]
-}
+name: Router Configuration
+description: This article covers Aurelia's router configuration.
+author: Jeremy Gonzalez (http://www.jeremyg.net)
 ---
-## [Basic Configuration](aurelia-doc://section/1/version/1.0.0)
+## Basic Configuration
 
 To use Aurelia's router, your component view must have a `<router-view></router-view>` element. In order to configure the router, the component's view-model requires a `configureRouter()` function.
 
@@ -29,7 +19,7 @@ To use Aurelia's router, your component view must have a `<router-view></router-
 </code-listing>
 
 <code-listing heading="Basic Route Configuration">
-  <source-code lang="ES 2015/2016">    
+  <source-code lang="ES 2015/2016">
     export class App {
       configureRouter(config, router) {
         this.router = router;
@@ -48,7 +38,7 @@ To use Aurelia's router, your component view must have a `<router-view></router-
 
     export class App {
       router: Router;
-    
+
       configureRouter(config: RouterConfiguration, router: Router): void {
         this.router = router;
         config.title = 'Aurelia';
@@ -62,8 +52,6 @@ To use Aurelia's router, your component view must have a `<router-view></router-
     }
   </source-code>
 </code-listing>
-
-* `router.isNavigating` True if the `Router` is currently processing a navigation, bear in mind that it only works when you are in base router and not in child routers.
 
 * `config.map()` adds route(s) to the router. Although only `route`, `name`, `moduleId`, `href` and `nav` are shown above there are other properties that can be included in a route. The interface name for a route is `RouteConfig`. You can also use `config.mapRoute()` to add a single route.
 * `route` - is the pattern to match against incoming URL fragments. It can be a string or array of strings. The route can contain parameterized routes or wildcards as well.
@@ -80,7 +68,20 @@ To use Aurelia's router, your component view must have a `<router-view></router-
   * `router` is a reference for AppRouter.
   * Other properties includes `relativeHref` and `order`.
 
-## [Options](aurelia-doc://section/2/version/1.0.0)
+### Navigation States
+
+The router contains a number of additional properties that indicate the current status of router navigation. These properties are only set on the base router, i.e. not in child routers. Additionally, these properties are all with respect to browser history which extends past the lifecycle of the router itself.
+
+* `router.isNavigating`: `true` if the router is currently processing a navigation.
+* `router.isNavigatingFirst`: `true` if the router is navigating into the app for the first time in the browser session.
+* `router.isNavigatingNew`: `true` if the router is navigating to a page instance not in the browser session history. This is triggered when the user clicks a link or the navigate function is called explicitly.
+* `router.isNavigatingForward`: `true` if the router is navigating forward in the browser session history. This is triggered when the user clicks the forward button in their browser.
+* `router.isNavigatingBack`: `true` if the router is navigating back in the browser session history. This is triggered when the user clicks the back button in their browser or when the `navigateBack()` function is called.
+* `router.isNavigatingRefresh`: `true` if the router is navigating due to a browser refresh.
+* `router.isExplicitNavigation`: `true` if the router is navigating due to explicit call to navigate function(s).
+* `router.isExplicitNavigationBack`: `true` if the router is navigating due to explicit call to navigateBack function.
+
+## Options
 
 ### Push State
 
@@ -124,7 +125,7 @@ Set `config.options.pushState` to `true` to activate push state and add [a base 
 > Warning
 > PushState requires server-side support. Don't forget to configure your server appropriately.
 
-## [Dynamically Specify Route Components](aurelia-doc://section/3/version/1.0.0)
+## Dynamically Specify Route Components
 
 You can add a `navigationStrategy` to a route to allow dynamic routes. Within the navigation strategy Aurelia requires you to configure `instruction.config` with the desired `moduleId`, `viewPorts` or `redirect`.
 
@@ -169,7 +170,7 @@ You can add a `navigationStrategy` to a route to allow dynamic routes. Within th
   </source-code>
 </code-listing>
 
-## [Adding Additional Data To A Route](aurelia-doc://section/4/version/1.0.0)
+## Adding Additional Data To A Route
 
 Although Aurelia does allow you to pass any additional property to a route's configuration object, `settings` is the default parameter to which you should add arbitrary data that you want to pass to the route.
 
@@ -204,7 +205,7 @@ Although Aurelia does allow you to pass any additional property to a route's con
   </source-code>
 </code-listing>
 
-## [Case Sensitive Routes](aurelia-doc://section/5/version/1.0.0)
+## Case Sensitive Routes
 
 You can set a route to be case sensitive, should you wish:
 
@@ -241,7 +242,7 @@ You can set a route to be case sensitive, should you wish:
 
 In the above example, our route will only match URL fragment of `/users` and not `/Users`, *but* since the route `home` is not case sensitive the URL `/Home` would match. By default Aurelia's routes are not case sensitive.
 
-## [Handling Unknown Routes](aurelia-doc://section/6/version/1.0.0)
+## Handling Unknown Routes
 
 Aurelia allows you to map any unknown routes. Parameters passed to `mapUnknownRoutes()` can be:
 
@@ -344,7 +345,7 @@ The function passed to `mapUnknownRoutes()` has to return:
   </source-code>
 </code-listing>
 
-## [Redirecting Routes](aurelia-doc://section/7/version/1.0.0)
+## Redirecting Routes
 
 Aurelia allows redirecting of routes to URL fragments by specifying redirect with a string consisting of a URL fragment.
 
@@ -360,7 +361,7 @@ Aurelia allows redirecting of routes to URL fragments by specifying redirect wit
 > Info: Use Redirect On Empty Routes with Child Routers
 > The `redirect` is particularly useful when you have an "empty" route pattern (such as the first route above) that maps to a component with a child router. In this case, create a non-empty route and then redirect the empty route to the non-empty route (as above). This will enable the child router to consistently match child routes without getting confused in scenarios where the empty route was matched.
 
-## [Pipelines](aurelia-doc://section/8/version/1.0.0)
+## Pipelines
 
 Aurelia has two router classes, `AppRouter` and `Router`. `AppRouter` extends the `Router` class and is the main application router. `Router` is used for any child routers including nested child routers. One of the main differences between the two is pipelines are only allowed on the `AppRouter` and not any child routers.
 
@@ -379,8 +380,7 @@ A pipeline step must be an object that contains a `run(navigationInstruction, ne
 
     export class App {
       configureRouter(config) {
-        const step = new AuthorizeStep;
-        config.addAuthorizeStep(step);
+        config.addAuthorizeStep(AuthorizeStep);
         config.map([
           { route: ['', 'home'],       name: 'home',       moduleId: 'home/index' },
           { route: 'users',            name: 'users',      moduleId: 'users/index',  settings: { auth: true } },
@@ -403,11 +403,10 @@ A pipeline step must be an object that contains a `run(navigationInstruction, ne
     }
   </source-code>
   <source-code lang="TypeScript">
-    import {Redirect, NavigationInstruction, RouterConfiguration, Next} from 'aurelia-router';
+    import {RouterConfiguration, NavigationInstruction, Next, Redirect} from 'aurelia-router';
 
     export class App {
       configureRouter(config: RouterConfiguration): void {
-        config.title = 'Aurelia';
         config.addAuthorizeStep(AuthorizeStep);
         config.map([
           { route: ['', 'home'],       name: 'home',       moduleId: 'home/index' },
@@ -440,7 +439,7 @@ A pipeline step must be an object that contains a `run(navigationInstruction, ne
           return step.run;
         }
         step.run = (navigationInstruction, next) => {
-          return next()
+          return next();
         };
         config.addPreActivateStep(step)
         config.map([
@@ -451,18 +450,16 @@ A pipeline step must be an object that contains a `run(navigationInstruction, ne
     }
   </source-code>
   <source-code lang="TypeScript">
-    import {NavigationInstruction, RouterConfiguration} from 'aurelia-router';
+    import {RouterConfiguration, NavigationInstruction, Next} from 'aurelia-router';
 
     export class App {
       configureRouter(config: RouterConfiguration): void {
         function step() {
           return step.run;
         }
-        step.run = (navigationInstruction: NavigationInstruction, next: Function): Promise<any> {
+        step.run = (navigationInstruction: NavigationInstruction, next: Next): Promise<any> {
           return next();
         };
-
-        config.title = 'Aurelia';
         config.addPreActivateStep(step);
         config.map([
           { route: ['', 'home'], name: 'home',  moduleId: 'home/index' },
@@ -478,7 +475,7 @@ A pipeline step must be an object that contains a `run(navigationInstruction, ne
     export class App {
       configureRouter(config) {
         const step = {
-          run: (navigationInstruction, next) => {
+          run(navigationInstruction, next) {
             return next();
           }
         };
@@ -491,17 +488,15 @@ A pipeline step must be an object that contains a `run(navigationInstruction, ne
     }
   </source-code>
   <source-code lang="TypeScript">
-    import {NavigationInstruction, RouterConfiguration} from 'aurelia-router';
+    import {RouterConfiguration, NavigationInstruction, Next} from 'aurelia-router';
 
     export class App {
       configureRouter(config: RouterConfiguration): void {
         const step = {
-          run: (navigationInstruction: NavigationInstruction, next: Function): Promise<any> {
+          run(navigationInstruction: NavigationInstruction, next: Next): Promise<any> {
             return next();
           }
         };
-
-        config.title = 'Aurelia';
         config.addPreRenderStep(step);
         config.map([
           { route: ['', 'home'], name: 'home',  moduleId: 'home/index' },
@@ -517,7 +512,7 @@ A pipeline step must be an object that contains a `run(navigationInstruction, ne
     export class App {
       configureRouter(config) {
         const step = {
-          run: (navigationInstruction, next) => {
+          run(navigationInstruction, next) {
             return next();
           }
         };
@@ -530,17 +525,15 @@ A pipeline step must be an object that contains a `run(navigationInstruction, ne
     }
   </source-code>
   <source-code lang="TypeScript">
-    import {NavigationInstruction, RouterConfiguration} from 'aurelia-router';
+    import {RouterConfiguration, NavigationInstruction, Next} from 'aurelia-router';
 
     export class App {
       configureRouter(config: RouterConfiguration): void {
         const step = {
-          run: (navigationInstruction: NavigationInstruction, next: Function): Promise<any> {
+          run(navigationInstruction: NavigationInstruction, next: Next): Promise<any> {
             return next();
           }
         };
-
-        config.title = 'Aurelia';
         config.addPostRenderStep(step);
         config.map([
           { route: ['', 'home'], name: 'home',  moduleId: 'home/index' },
@@ -551,7 +544,7 @@ A pipeline step must be an object that contains a `run(navigationInstruction, ne
   </source-code>
 </code-listing>
 
-## [Rendering View Ports](aurelia-doc://section/9/version/1.0.0)
+## Rendering View Ports
 
 Every instance of a `router-view` custom element essentially defines a "view port". When you give a `router-view` a name, you can refer to it in the `viewPorts` property of the route configuration in your javascript. The value of a `viewPorts` property is an object where each property name is the name of a view port (ie, `router-view`) and each value is the `moduleId` destination of the route. Thus you can specify any number of view ports on a single route configuration.
 
@@ -598,17 +591,116 @@ Following is an example of the use of view ports:
   </source-code>
 </code-listing>
 
+### Empty View Ports
+
+You can empty a view port by setting `moduleId` null in the route configuration for that view port.
+
+<code-listing>
+  <source-code lang="ES 2015/2016">
+    export class App {
+      configureRouter(config) {
+        config.title = 'Aurelia';
+        config.map([
+          { route: 'users', name: 'users', viewPorts: { left: { moduleId: 'user/list' }, right: { moduleId: null } } }
+        ]);
+      }
+    }
+  </source-code>
+  <source-code lang="TypeScript">
+    import {RouterConfiguration} from 'aurelia-router';
+
+    export class App {
+      configureRouter(config: RouterConfiguration): void {
+        config.title = 'Aurelia';
+        config.map([
+          { route: 'users', name: 'users', viewPorts: { left: { moduleId: 'user/list' }, right: { moduleId: null } } }
+        ]);
+      }
+    }
+  </source-code>
+</code-listing>
+
+### View Port Defaults
+
+The empty view port is actually the out-of-the-box default. You can override this default to load a specific `moduleId` whenever `moduleId` is null by passing a view port configuration to the router configuration. These overrides can be set specifically to each view port.
+
+<code-listing>
+  <source-code lang="ES 2015/2016">
+    export class App {
+      configureRouter(config) {
+        config.title = 'Aurelia';
+        config.map([
+          { route: 'users', name: 'users', viewPorts: { left: { moduleId: 'user/list' }, right: { moduleId: null } } }
+        ]);
+        config.useViewPortDefaults({
+          right: { moduleId: 'pages/placeholder' }
+        })
+      }
+    }
+  </source-code>
+  <source-code lang="TypeScript">
+    import {RouterConfiguration} from 'aurelia-router';
+
+    export class App {
+      configureRouter(config: RouterConfiguration): void {
+        config.title = 'Aurelia';
+        config.map([
+          { route: 'users', name: 'users', viewPorts: { left: { moduleId: 'user/list' }, right: { moduleId: null } } }
+        ]);
+        config.useViewPortDefaults({
+          right: { moduleId: 'pages/placeholder' }
+        })
+      }
+    }
+  </source-code>
+</code-listing>
+
+### Optional View Ports
+
+If a view port configuration is not defined on a route, the router will skip routing on that particular view port leaving the view port untouched. If there is no existing content in the view port, i.e. when the application is first loaded, the view port will be populated with the view port default configuration, which is empty if not otherwise specified (see View Port Defaults).
+
+<code-listing>
+  <source-code lang="ES 2015/2016">
+    export class App {
+      configureRouter(config) {
+        config.title = 'Aurelia';
+        config.map([
+          { route: 'users', name: 'users', viewPorts: { left: { moduleId: 'user/list' } } }
+        ]);
+        config.useViewPortDefaults({
+          right: { moduleId: 'pages/placeholder' }
+        })
+      }
+    }
+  </source-code>
+  <source-code lang="TypeScript">
+    import {RouterConfiguration} from 'aurelia-router';
+
+    export class App {
+      configureRouter(config: RouterConfiguration): void {
+        config.title = 'Aurelia';
+        config.map([
+          { route: 'users', name: 'users', viewPorts: { left: { moduleId: 'user/list' } } }
+        ]);
+        config.useViewPortDefaults({
+          right: { moduleId: 'pages/placeholder' }
+        })
+      }
+    }
+  </source-code>
+</code-listing>
+
 > Info
-> In addition to the `moduleId`, you can also specify a "layout" in the configuration of a view port. See the discussion of Layouts elsewhere in this document.
+> In addition to the `moduleId`, you can also specify a "layout" in the configuration of a view port (see [Layouts](aurelia-doc://section/10/version/1.0.0)).
 
-## [Layouts](aurelia-doc://section/10/version/1.0.0)
+## Layouts
 
-Similar to MVC-style master/layout pages, Aurelia allows you to use a "layout" view like an MVC "master template" for a set of views. 
+Similar to MVC-style master/layout pages, Aurelia allows you to use a "layout" view like an MVC "master template" for a set of views.
 
 The set of views subject to being part of a layout is defined in Aurelia as a set of views referenced by one or more routes in a router configuration. There are two ways to associate a layout with routes. The first is via HTML, the second is via view model code.
 
 > Info
-> We're going to be a little sloppy here in terminology. Technically, routes refer to "moduleIds", not 
+> We're going to be a little sloppy here in terminology. Technically, routes refer to "moduleIds", not
 "views". Since the router resolves a `moduleId` to a view, indirectly the router does reference a view. It is easy to picture a view visually contained within a layout, so in this topic to we'll refer to views referenced by a route, not modules.
 
 We'll look at using HTML first. We know that the `router-view` custom HTML element is always associated with a set of one or more views referenced in a router configuration given in its parent view's view model. By associating a layout with a `router-view` one can thus associate a layout with the same set of views with which the `router-view` is associated.
@@ -724,7 +816,7 @@ Thus when we navigate to the module "home" we find that it is laid-out as desire
 
 Note there is nothing different about the above route configuration with or without the layout.  It may reference any number of views that would all be included by default in the layout.
 
-So that is how we use HTML to associate a layout view with a set of views referenced in a router configuration.  
+So that is how we use HTML to associate a layout view with a set of views referenced in a router configuration.
 
 We can also associate layouts with route configurations using code in our view model. Suppose we like what we've done above, but we have a couple views that we would like to associate with a different layout and would thus like to partially override the configuration given in the HTML. The following code is an example of how we can do that:
 
@@ -802,14 +894,14 @@ You can also specify a layout in the `viewPorts` configuration of a route. See a
   </source-code>
 </code-listing>
 
-## [View Swapping and Animation](aurelia-doc://section/11/version/1.0.0)
+## View Swapping and Animation
 
 When the Aurelia router navigates from one view to another, we refer to this as "swapping" one view for another.  Aurelia gives us an optional set of strategies dictating how a swap proceeds, or more specifically, how animation plays out during the swap.  We refer to these strategies more precisely as the "swap order".
 
 > Info
 > If there is no animation defined, then swap-order has no visible impact.
 
-You can apply a swap strategy to one or more routes by applying the `swap-order` attribute to a `router-view` custom HTML element.  The strategy will then be applied in any transition between two views accessible under the `router-view`.  
+You can apply a swap strategy to one or more routes by applying the `swap-order` attribute to a `router-view` custom HTML element.  The strategy will then be applied in any transition between two views accessible under the `router-view`.
 
 > Info
 > `swap-order` is bindable.
@@ -821,7 +913,7 @@ The following swap order strategies are available:
 * after - animate the next view in after the current view has been removed (the default)
 
 Here is an example of setting the swap order strategy on a `router-view`:
- 
+
 <code-listing heading="swap-order">
   <source-code lang="HTML">
     <template>
@@ -833,7 +925,7 @@ Here is an example of setting the swap order strategy on a `router-view`:
 </code-listing>
 
 
-## [Internationalizing Titles](aurelia-doc://section/12/version/1.0.0)
+## Internationalizing Titles
 
 If your application targets multiple cultures or languages, you probably want to translate your route titles. The `Router` class has a `transformTitle` property that can be used for this. It is expected to be assigned a function that takes the active route's title as a parameter and then returns the translated title. For example, if your app uses `aurelia-i18n`, its routes' titles would typically be set to some translation keys
 and the `AppRouter`'s `transformTitle` would be configured in such a way that the active route's title is translated using the `I18N`'s `tr` method. Additionally you can listen to a custom event published by the I18N service to react on locale changes using the EventAggregator:
@@ -859,7 +951,7 @@ and the `AppRouter`'s `transformTitle` would be configured in such a way that th
           }).then(() => {
             const router = aurelia.container.get(AppRouter);
             router.transformTitle = title => i18n.tr(title);
-            
+
             const eventAggregator = aurelia.container.get(EventAggregator);
             eventAggregator.subscribe('i18n:locale:changed', () => {
               router.updateTitle();
@@ -891,7 +983,7 @@ and the `AppRouter`'s `transformTitle` would be configured in such a way that th
           }).then(() => {
             const router = aurelia.container.get(AppRouter);
             router.transformTitle = title => i18n.tr(title);
-            
+
             const eventAggregator = aurelia.container.get(EventAggregator);
             eventAggregator.subscribe('i18n:locale:changed', () => {
               router.updateTitle();
@@ -949,7 +1041,7 @@ The default value of the`transformTitle` property does the following:
 
 In the previous example, the `AppRouter`'s `transformTitle` is set, so all child `Router`s will delegate down to it by default. However, this means that the `transformTitle` can be overridden for specific child `Router`s if some areas of your app need custom transformation.
 
-## [Configuring a Fallback Route](aurelia-doc://section/13/version/1.0.0)
+## Configuring a Fallback Route
 
 Whenever navigation is rejected, it is redirected to a previous location. However in certain cases a previous location doesn't exist, e.g. when it happens as the first navigation after the startup of application. To handle this scenario, you can set up a fallback route.
 
@@ -988,7 +1080,7 @@ Whenever navigation is rejected, it is redirected to a previous location. Howeve
   </source-code>
 </code-listing>
 
-## [Reusing an Existing View Model](aurelia-doc://section/14/version/1.0.0)
+## Reusing an Existing View Model
 
 Since the view model's navigation lifecycle is called only once, you may have problems recognizing that the user switched the route from `Product A` to `Product B` (see below). To work around this issue implement the method `determineActivationStrategy` in your view model and return hints for the router about what you'd like to happen. Available return values are `replace` and `invoke-lifecycle`. Remember, "lifecycle" refers to the navigation lifecycle.
 
